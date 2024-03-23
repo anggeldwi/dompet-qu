@@ -18,14 +18,9 @@ type Transaction struct {
 	Status         string
 	VaNumber       string
 	Bank           string
-	// BookingDate           string
-	PhoneNumber string
-	// Greeting              string
-	// FullName              string
-	// Email                 string
-	// Quantity              int
-	ExpiredAt time.Time
-	User      ud.User
+	PhoneNumber    string
+	ExpiredAt      time.Time
+	User           ud.User
 }
 
 func CoreToModelTransction(input transaction.Core) Transaction {
