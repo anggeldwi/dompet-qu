@@ -20,21 +20,6 @@ func (service *transactionService) TopUp(userIdLogin int, inputTransaction trans
 	if inputTransaction.Bank == "" {
 		return nil, errors.New("bank is required")
 	}
-	// if inputTransaction.PhoneNumber == "" {
-	// 	return nil, errors.New("phone number is required")
-	// }
-	// if inputBooking.Greeting == "" {
-	// 	return nil, errors.New("greeting is required")
-	// }
-	// if inputBooking.FullName == "" {
-	// 	return nil, errors.New("full name number is required")
-	// }
-	// if inputBooking.Email == "" {
-	// 	return nil, errors.New("email is required")
-	// }
-	// if inputBooking.BookingDate == "" {
-	// 	return nil, errors.New("booking date is required")
-	// }
 
 	payment, err := service.transactionData.TopUp(userIdLogin, inputTransaction)
 	if err != nil {
@@ -42,4 +27,18 @@ func (service *transactionService) TopUp(userIdLogin int, inputTransaction trans
 	}
 
 	return payment, nil
+}
+
+// Transfer implements transaction.TransactionServiceInterface.
+func (service *transactionService) Transfer(userIdLogin int, receiverPhoneNumber string, inputTransaction transaction.Core) (*transaction.Core, error) {
+	if receiverPhoneNumber == "" {
+		return nil, errors.New("receiver phone number is required")
+	}
+
+	transfer, err := service.transactionData.Transfer(userIdLogin, receiverPhoneNumber, inputTransaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return transfer, nil
 }

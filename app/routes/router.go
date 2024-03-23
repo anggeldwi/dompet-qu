@@ -39,4 +39,5 @@ func InitRouter(db *gorm.DB, e *echo.Echo) {
 
 	// define routes/ endpoint transactions
 	e.POST("/topup", transactionHandlerAPI.TopUp, middlewares.JWTMiddleware())
+	e.POST("/transfer", transactionHandlerAPI.Transfer, middlewares.JWTMiddleware())
 }

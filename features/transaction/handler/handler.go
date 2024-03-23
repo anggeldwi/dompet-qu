@@ -40,26 +40,39 @@ func (handler *TransactionHandler) TopUp(c echo.Context) error {
 	if errInsert != nil {
 		if strings.Contains(errInsert.Error(), "bank is required") {
 			return c.JSON(http.StatusBadRequest, responses.WebResponse("bank is required", nil))
-			// } else if strings.Contains(errInsert.Error(), "phone number is required") {
-			// 	return c.JSON(http.StatusBadRequest, responses.WebResponse("phone number is required", nil))
-			// } else if strings.Contains(errInsert.Error(), "greeting is required") {
-			// 	return c.JSON(http.StatusBadRequest, responses.WebResponse("greeting is required", nil))
-			// } else if strings.Contains(errInsert.Error(), "full name number is required") {
-			// 	return c.JSON(http.StatusBadRequest, responses.WebResponse("full name number is required", nil))
-			// } else if strings.Contains(errInsert.Error(), "email is required") {
-			// 	return c.JSON(http.StatusBadRequest, responses.WebResponse("email is required", nil))
-			// } else if strings.Contains(errInsert.Error(), "booking date is required") {
-			// 	return c.JSON(http.StatusBadRequest, responses.WebResponse("booking date is required", nil))
-			// } else if strings.Contains(errInsert.Error(), "maaf, anda tidak bisa menggunakan voucher ini karena total pembayaran anda terlalu rendah") {
-			// 	return c.JSON(http.StatusBadRequest, responses.WebResponse("maaf, anda tidak bisa menggunakan voucher ini karena total pembayaran anda terlalu rendah", nil))
-			// } else if strings.Contains(errInsert.Error(), "user has already used this voucher") {
-			// 	return c.JSON(http.StatusConflict, responses.WebResponse("user has already used this voucher", nil))
 		} else {
-			return c.JSON(http.StatusInternalServerError, responses.WebResponse("error insert booking", nil))
+			return c.JSON(http.StatusInternalServerError, responses.WebResponse("error insert top up", nil))
 		}
 	}
 
 	result := CoreToResponseTopUp(payment)
 
-	return c.JSON(http.StatusOK, responses.WebResponse("success insert booking", result))
+	return c.JSON(http.StatusOK, responses.WebResponse("success insert top up", result))
+}
+
+func (handler *TransactionHandler) Transfer(c echo.Context) error {
+	userIdLogin := middlewares.ExtractTokenUserId(c)
+	if userIdLogin == 0 {
+		return c.JSON(http.StatusUnauthorized, responses.WebResponse("Unauthorized user", nil))
+	}
+
+	newTransfer := TransferRequest{}
+	errBind := c.Bind(&newTransfer)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, responses.WebResponse("error bind data. data transfer not valid", nil))
+	}
+
+	transactionCore := RequestToCoreTransfer(newTransfer, uint(userIdLogin), newTransfer.PhoneNumber)
+
+	if transactionCore.JenisTransaksi == "" {
+		transactionCore.JenisTransaksi = "transfer"
+	}
+	transfer, errInsert := handler.transactionService.Transfer(userIdLogin, newTransfer.PhoneNumber, transactionCore)
+	if errInsert != nil {
+		return c.JSON(http.StatusInternalServerError, responses.WebResponse(errInsert.Error(), nil))
+	}
+
+	result := CoreToResponseTransfer(transfer)
+
+	return c.JSON(http.StatusOK, responses.WebResponse("success insert transfer", result))
 }

@@ -23,8 +23,10 @@ type Core struct {
 
 type TransactionDataInterface interface {
 	TopUp(userIdLogin int, inputTransaction Core) (*Core, error)
+	Transfer(userIdLogin int, receiverPhoneNumber string, inputTransaction Core) (*Core, error)
 }
 
 type TransactionServiceInterface interface {
 	TopUp(userIdLogin int, inputTransaction Core) (*Core, error)
+	Transfer(userIdLogin int, receiverPhoneNumber string, inputTransaction Core) (*Core, error)
 }
